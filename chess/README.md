@@ -13,14 +13,51 @@ A fully-featured browser chess game with an elegant dark-gold UI, high-quality S
 - **Full chess rules** — castling, en passant, pawn promotion, check/checkmate/stalemate detection
 - **Move history** — algebraic notation sidebar
 
-## Running Locally
+## How to Run
+
+There are two ways to play — choose whichever suits you.
+
+---
+
+### Option 1 — Open directly in your browser (easiest, no install needed)
+
+The game is a single self-contained HTML file with no external dependencies.
+
+1. Download or clone this repository
+2. Double-click `index.html` in Finder (Mac) or File Explorer (Windows)
+3. The game opens instantly in your default browser
+
+Or from the Terminal:
 
 ```bash
+open index.html          # Mac
+start index.html         # Windows
+xdg-open index.html      # Linux
+```
+
+---
+
+### Option 2 — Run with the Python / Flask server
+
+Use this if you want to host the game so others on your network can play.
+
+**Prerequisites:** Python 3.8 or later
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/abandari/games.git
+cd games/chess
+
+# 2. Install Flask
 pip install -r requirements.txt
+
+# 3. Start the server
 python app.py
 ```
 
-Then open [http://localhost:5000](http://localhost:5000).
+Then open **http://localhost:5000** in your browser.
+
+To let others on the same Wi-Fi network play, share your local IP address (e.g. `http://192.168.1.x:5000`). Find it with `ipconfig getifaddr en0` on Mac or `ipconfig` on Windows.
 
 ## Project Structure
 
