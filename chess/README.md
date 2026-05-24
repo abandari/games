@@ -57,7 +57,30 @@ python app.py
 
 Then open **http://localhost:5000** in your browser.
 
-To let others on the same Wi-Fi network play, share your local IP address (e.g. `http://192.168.1.x:5000`). Find it with `ipconfig getifaddr en0` on Mac or `ipconfig` on Windows.
+Then open **http://localhost:5000** in your browser.
+
+#### LAN sharing (let others on your network play)
+
+```bash
+HOST=0.0.0.0 python app.py
+```
+
+Find your local IP with `ipconfig getifaddr en0` (Mac) or `ipconfig` (Windows), then share `http://192.168.x.x:5000`.
+> **Note:** Never set `HOST=0.0.0.0` together with `DEBUG=true` — the app will refuse to start to prevent exposing the debug console on the network.
+
+## Security
+
+The Flask server applies the following hardening out of the box:
+
+| Header / Control | Value |
+|-----------------|-------|
+| Content-Security-Policy | Restricts scripts to `'self'`, no inline JS, fonts from Google only |
+| X-Frame-Options | `DENY` — prevents clickjacking |
+| X-Content-Type-Options | `nosniff` — prevents MIME-type sniffing |
+| Referrer-Policy | `no-referrer` |
+| Permissions-Policy | Disables camera, microphone, geolocation |
+| Default host binding | `127.0.0.1` (localhost only) — set `HOST=0.0.0.0` to expose on LAN |
+| Debug guard | Server refuses to start with `DEBUG=true` on a public interface |
 
 ## Project Structure
 
