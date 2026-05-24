@@ -5,7 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Royal Chess</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@400;700&display=swap');
+@font-face{font-family:'Cinzel';font-style:normal;font-weight:400 900;font-display:swap;src:url('/static/fonts/cinzel-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Cinzel';font-style:normal;font-weight:400 900;font-display:swap;src:url('/static/fonts/cinzel.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Cinzel Decorative';font-style:normal;font-weight:400;font-display:swap;src:url('/static/fonts/cinzel-deco-400-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Cinzel Decorative';font-style:normal;font-weight:400;font-display:swap;src:url('/static/fonts/cinzel-deco-400.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Cinzel Decorative';font-style:normal;font-weight:700;font-display:swap;src:url('/static/fonts/cinzel-deco-700-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Cinzel Decorative';font-style:normal;font-weight:700;font-display:swap;src:url('/static/fonts/cinzel-deco-700.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--gold:#C9A84C;--gold-l:#F0D080;--gold-d:#8B6914;--bg:#0d0d1f;--panel:#111128;--lsq:#F0D9B5;--dsq:#B58863;}
 body{background:var(--bg);background-image:radial-gradient(ellipse at 50% 0%,#1a1a3a 0%,#0d0d1f 65%);display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:'Georgia',serif;color:#e8d5b7;}
@@ -241,7 +246,11 @@ function toast(title, msg, cls='') {
   const icons = {tc:'⚠️', tcastle:'🏰', tpromo:'👑', tcap:'⚔️', '':'♟'};
   const t = document.createElement('div');
   t.className = 'toast ' + cls;
-  t.innerHTML = `<span class="ti">${icons[cls]||icons['']}</span><div class="tb"><div class="tt">${title}</div><div class="tm">${msg}</div></div>`;
+  const ti = document.createElement('span'); ti.className='ti'; ti.textContent=icons[cls]||icons[''];
+  const tb = document.createElement('div');  tb.className='tb';
+  const tt = document.createElement('div');  tt.className='tt'; tt.textContent=title;
+  const tm = document.createElement('div');  tm.className='tm'; tm.textContent=msg;
+  tb.appendChild(tt); tb.appendChild(tm); t.appendChild(ti); t.appendChild(tb);
   document.getElementById('toasts').appendChild(t);
   setTimeout(()=>{ t.classList.add('out'); setTimeout(()=>t.remove(),300); }, 2800);
 }
@@ -491,8 +500,9 @@ function showPromo(col) {
   for(const t of['Q','R','B','N']) {
     const btn=document.createElement('button');
     btn.className='pp-btn';
-    btn.innerHTML=`<span class="${cls}">${SYM[col][t]}</span>`;
-    btn.style.cssText=col===WC?'color:#f5efe0;text-shadow:0 2px 6px rgba(0,0,0,.8)':'color:#1c1c2e;text-shadow:1px 1px 0 #b0a060,0 2px 6px rgba(0,0,0,.9)';
+    const sp=document.createElement('span'); sp.className=cls; sp.textContent=SYM[col][t];
+    sp.style.cssText=col===WC?'color:#f5efe0;text-shadow:0 2px 6px rgba(0,0,0,.8)':'color:#1c1c2e;text-shadow:1px 1px 0 #b0a060,0 2px 6px rgba(0,0,0,.9)';
+    btn.appendChild(sp);
     btn.onclick=()=>{modal.style.display='none';const mv=pendingPromo;pendingPromo=null;execMove(mv,t);};
     cont.appendChild(btn);
   }
@@ -583,13 +593,11 @@ function onClick(r,c) {
 
 function drawLabels() {
   const rl=document.getElementById('rlabels'), fl=document.getElementById('flabels');
-  if(playerColor===WC){
-    rl.innerHTML=[8,7,6,5,4,3,2,1].map(n=>`<span>${n}</span>`).join('');
-    fl.innerHTML=['a','b','c','d','e','f','g','h'].map(l=>`<span>${l}</span>`).join('');
-  } else {
-    rl.innerHTML=[1,2,3,4,5,6,7,8].map(n=>`<span>${n}</span>`).join('');
-    fl.innerHTML=['h','g','f','e','d','c','b','a'].map(l=>`<span>${l}</span>`).join('');
-  }
+  const ranks=playerColor===WC?[8,7,6,5,4,3,2,1]:[1,2,3,4,5,6,7,8];
+  const files=playerColor===WC?['a','b','c','d','e','f','g','h']:['h','g','f','e','d','c','b','a'];
+  rl.innerHTML=''; fl.innerHTML='';
+  ranks.forEach(n=>{const s=document.createElement('span');s.textContent=n;rl.appendChild(s);});
+  files.forEach(l=>{const s=document.createElement('span');s.textContent=l;fl.appendChild(s);});
 }
 
 function updateStatus() {
@@ -602,11 +610,14 @@ function updateStatus() {
 
 function updateCap() {
   const mk=(arr,id)=>{
-    document.getElementById(id).innerHTML=arr.map(p=>{
-      const cls=p.c===WC?'wp':'bp';
-      const style=p.c===WC?'color:#f5efe0;text-shadow:0 1px 3px rgba(0,0,0,.6)':'color:#1c1c2e;text-shadow:1px 1px 0 #b0a060';
-      return `<span class="cap-pc ${cls}" style="${style}">${SYM[p.c][p.t]}</span>`;
-    }).join('');
+    const el=document.getElementById(id); el.innerHTML='';
+    arr.forEach(p=>{
+      const s=document.createElement('span');
+      s.className=`cap-pc ${p.c===WC?'wp':'bp'}`;
+      s.style.cssText=p.c===WC?'color:#f5efe0;text-shadow:0 1px 3px rgba(0,0,0,.6)':'color:#1c1c2e;text-shadow:1px 1px 0 #b0a060';
+      s.textContent=SYM[p.c][p.t];
+      el.appendChild(s);
+    });
   };
   mk(capPlayer,'cap-player'); mk(capCPU,'cap-cpu');
 }
@@ -627,7 +638,10 @@ function renderHistory() {
   for(let i=0;i<history.length;i+=2) {
     const w=history[i],bl=history[i+1];
     const div=document.createElement('div'); div.className='mrow';
-    div.innerHTML=`<span class="mn">${i/2+1}.</span><span class="mw">${mvToAN(w.mv,w.board)}</span><span class="mb">${bl?mvToAN(bl.mv,bl.board):''}</span>`;
+    const mn=document.createElement('span'); mn.className='mn'; mn.textContent=`${i/2+1}.`;
+    const mw=document.createElement('span'); mw.className='mw'; mw.textContent=mvToAN(w.mv,w.board);
+    const mb=document.createElement('span'); mb.className='mb'; mb.textContent=bl?mvToAN(bl.mv,bl.board):'';
+    div.appendChild(mn); div.appendChild(mw); div.appendChild(mb);
     el.appendChild(div);
   }
   el.scrollTop=el.scrollHeight;
