@@ -34,17 +34,19 @@ body{background:var(--bg);background-image:radial-gradient(ellipse at 50% 0%,#1a
 
 /* GAME */
 #game{display:none;flex-direction:row;gap:28px;align-items:center;padding:20px}
-.board-frame{padding:18px;background:linear-gradient(145deg,#2a1f0a,#5a3e14,#3a2a0a,#4a3510);border-radius:6px;box-shadow:0 0 70px rgba(139,105,20,.65),0 0 140px rgba(139,105,20,.3),inset 0 0 40px rgba(0,0,0,.5);border:1px solid #6a5010;}
+.board-frame{padding:24px;background:linear-gradient(145deg,#4a3008 0%,#7a5520 18%,#3a2408 38%,#6a4818 58%,#2a1c06 78%,#5a3e14 100%);border-radius:10px;box-shadow:0 28px 70px rgba(0,0,0,.9),0 10px 30px rgba(0,0,0,.65),0 0 80px rgba(139,105,20,.45),inset 4px 4px 0 rgba(255,205,80,.18),inset -4px -4px 0 rgba(0,0,0,.5);border:2px solid #9a7828;position:relative;}
+.board-frame::before{content:'';position:absolute;inset:10px;border-radius:6px;box-shadow:inset 0 0 30px rgba(0,0,0,.55);pointer-events:none;z-index:10;}
 .board-with-ranks{display:flex}
 .rank-labels{display:flex;flex-direction:column;margin-right:6px;width:16px;}
 .rank-labels span{height:72px;line-height:72px;font-family:'Cinzel','Georgia',serif;font-size:11px;color:var(--gold);opacity:.7;text-align:center;}
-.chess-board{display:grid;grid-template-columns:repeat(8,72px);grid-template-rows:repeat(8,72px);border:2px solid rgba(201,168,76,.45);}
+.chess-board{display:grid;grid-template-columns:repeat(8,72px);grid-template-rows:repeat(8,72px);border:3px solid rgba(201,168,76,.65);box-shadow:inset 0 0 25px rgba(0,0,0,.45),0 0 0 1px rgba(0,0,0,.5);}
 .file-labels{display:flex;margin-top:6px;margin-left:22px;}
 .file-labels span{width:72px;text-align:center;font-family:'Cinzel','Georgia',serif;font-size:11px;color:var(--gold);opacity:.7;}
 
 /* SQUARES */
 .sq{width:72px;height:72px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
-.sq.light{background:var(--lsq)}.sq.dark{background:var(--dsq)}
+.sq.light{background:radial-gradient(ellipse at 35% 30%,#f8e8c8 0%,#e4c898 55%,#bda070 100%)}
+.sq.dark{background:radial-gradient(ellipse at 35% 30%,#c89060 0%,#9e6e38 55%,#7a5020 100%)}
 .sq.sel-sq{background:#f6f669!important;box-shadow:inset 0 0 12px rgba(200,200,0,.4)}
 .sq.lm-from,.sq.lm-to{background:rgba(20,85,30,.42)!important}
 .sq.check-sq{background:rgba(210,0,0,.5)!important;animation:chkPulse 1s infinite alternate}
@@ -52,35 +54,14 @@ body{background:var(--bg);background-image:radial-gradient(ellipse at 50% 0%,#1a
 .sq.leg-empty::after{content:'';position:absolute;width:32%;height:32%;border-radius:50%;background:rgba(0,0,0,.22);pointer-events:none;z-index:2;}
 .sq.leg-cap::after{content:'';position:absolute;width:100%;height:100%;border:6px solid rgba(0,0,0,.22);border-radius:50%;background:transparent;pointer-events:none;z-index:2;}
 
-/* PIECES */
-.piece{
-  font-size:58px;line-height:1;user-select:none;
-  position:relative;z-index:1;pointer-events:none;
-  transition:transform .12s;
-}
-.piece.wp{
-  color:#f5efe0;
-  text-shadow:
-    1px 1px 0 #8a6820,
-   -1px -1px 0 #8a6820,
-    1px -1px 0 #8a6820,
-   -1px  1px 0 #8a6820,
-    0 3px 8px rgba(0,0,0,.7),
-    0 0 20px rgba(255,240,180,.15);
-  filter:drop-shadow(0 4px 6px rgba(0,0,0,.6));
-}
-.piece.bp{
-  color:#1c1c2e;
-  text-shadow:
-    1px 1px 0 #b0a060,
-   -1px -1px 0 #b0a060,
-    1px -1px 0 #b0a060,
-   -1px  1px 0 #b0a060,
-    0 3px 8px rgba(0,0,0,.9);
-  filter:drop-shadow(0 4px 6px rgba(0,0,0,.8));
-}
-.sq:hover .piece{transform:scale(1.1) translateY(-2px);}
-.sq.sel-sq .piece{transform:scale(1.12) translateY(-3px);}
+/* PIECES — SVG 3D */
+.piece-svg{pointer-events:none;position:relative;z-index:1;display:block;
+  transition:transform .15s,filter .15s;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.55)) drop-shadow(0 1px 2px rgba(0,0,0,.4));}
+.sq:hover .piece-svg{transform:scale(1.1) translateY(-3px);
+  filter:drop-shadow(0 8px 14px rgba(0,0,0,.7)) drop-shadow(0 2px 3px rgba(0,0,0,.5));}
+.sq.sel-sq .piece-svg{transform:scale(1.12) translateY(-4px);
+  filter:drop-shadow(0 9px 16px rgba(0,0,0,.75)) drop-shadow(0 0 14px rgba(201,168,76,.5));}
 
 /* SIDE PANEL */
 .side-panel{display:flex;flex-direction:column;gap:14px;width:210px}
@@ -230,11 +211,138 @@ body{background:var(--bg);background-image:radial-gradient(ellipse at 50% 0%,#1a
 <div id="toasts"></div>
 
 <script>
-// ── PIECE SYMBOLS ──────────────────────────────
+// ── PIECE SYMBOLS (setup screen only) ─────────
 const SYM = {
   white:{K:'♔',Q:'♕',R:'♖',B:'♗',N:'♘',P:'♙'},
   black:{K:'♚',Q:'♛',R:'♜',B:'♝',N:'♞',P:'♟'}
 };
+
+// ── 3-D SVG PIECE FACTORY ──────────────────────
+function createPieceEl(pc) {
+  const isW = pc.c === 'white';
+  const id  = Math.random().toString(36).substr(2, 8);
+
+  // Palette
+  const hi  = isW ? '#fff8ee' : '#6868a8';
+  const mid = isW ? '#d4a86a' : '#252548';
+  const drk = isW ? '#6a3c08' : '#080820';
+  const rim = isW ? '#5a3206' : '#c8a830';
+
+  // Shared defs: shadow, sphere radial, cylinder linear, base linear
+  const defs = `<defs>
+    <radialGradient id="sh${id}" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="rgba(0,0,0,.5)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+    <radialGradient id="rg${id}" cx="33%" cy="27%" r="70%">
+      <stop offset="0%"   stop-color="${hi}"/>
+      <stop offset="50%"  stop-color="${mid}"/>
+      <stop offset="100%" stop-color="${drk}"/>
+    </radialGradient>
+    <linearGradient id="lg${id}" x1="12%" y1="0%" x2="88%" y2="100%">
+      <stop offset="0%"   stop-color="${hi}" stop-opacity=".9"/>
+      <stop offset="45%"  stop-color="${mid}"/>
+      <stop offset="100%" stop-color="${drk}"/>
+    </linearGradient>
+    <linearGradient id="cg${id}" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="${drk}"/>
+      <stop offset="28%"  stop-color="${mid}"/>
+      <stop offset="55%"  stop-color="${hi}"/>
+      <stop offset="100%" stop-color="${drk}"/>
+    </linearGradient>
+  </defs>`;
+
+  let body = '';
+  switch (pc.t) {
+
+    case 'P': body = `
+      <ellipse cx="22" cy="40" rx="10" ry="2.5" fill="url(#sh${id})"/>
+      <path d="M14,37 Q14,32 16,31 Q19,30 22,30 Q25,30 28,31 Q30,32 30,37 Z"
+            fill="url(#lg${id})" stroke="${rim}" stroke-width=".8"/>
+      <path d="M20,30 Q19.5,27 19.5,24 Q19.5,22 22,22 Q24.5,22 24.5,24 Q24.5,27 24,30 Z"
+            fill="url(#cg${id})" stroke="${rim}" stroke-width=".5"/>
+      <circle cx="22" cy="17" r="7.5" fill="url(#rg${id})" stroke="${rim}" stroke-width=".8"/>
+      <ellipse cx="19.5" cy="14.5" rx="2.8" ry="2" fill="${hi}" opacity=".55"/>
+    `; break;
+
+    case 'R': body = `
+      <ellipse cx="22" cy="40.5" rx="12" ry="2.5" fill="url(#sh${id})"/>
+      <path d="M13,37 Q12,32 14,31 Q17,30 22,30 Q27,30 30,31 Q32,32 31,37 Z"
+            fill="url(#lg${id})" stroke="${rim}" stroke-width=".8"/>
+      <rect x="16.5" y="17" width="11" height="13.5" fill="url(#cg${id})" stroke="${rim}" stroke-width=".5"/>
+      <path d="M15,17 L15,12 L18,12 L18,17 M20.5,17 L20.5,12 L23.5,12 L23.5,17 M26,17 L26,12 L29,12 L29,17"
+            fill="url(#cg${id})" stroke="${rim}" stroke-width=".7"/>
+      <rect x="14.5" y="17" width="15" height="1.5" fill="${rim}" opacity=".5"/>
+      <ellipse cx="20" cy="19" rx="3" ry="1.2" fill="${hi}" opacity=".4"/>
+    `; break;
+
+    case 'N': body = `
+      <ellipse cx="22" cy="40.5" rx="12" ry="2.5" fill="url(#sh${id})"/>
+      <path d="M13,37 Q12,32 14,31 Q17,30 22,30 Q27,30 30,31 Q32,32 31,37 Z"
+            fill="url(#lg${id})" stroke="${rim}" stroke-width=".8"/>
+      <path d="M19,30 L18,26 Q16.5,22 18,19 Q18,17 17,15 L19,12 L20.5,9 L19,6
+               L23,9 L26,9 Q29,11 29,15 Q29,18.5 27.5,20.5 Q29.5,20.5 30,21.5
+               Q30,22.5 28,22.5 L25,22.5 Q22,24.5 20,22 L21,30 Z"
+            fill="url(#rg${id})" stroke="${rim}" stroke-width=".85"/>
+      <circle cx="26" cy="14.5" r="1.6" fill="${drk}"/>
+      <ellipse cx="19" cy="10.5" rx="2.2" ry="1.5" fill="${hi}" opacity=".45"/>
+    `; break;
+
+    case 'B': body = `
+      <ellipse cx="22" cy="40.5" rx="11" ry="2.5" fill="url(#sh${id})"/>
+      <path d="M13,37 Q12,32 14,31 Q17,30 22,30 Q27,30 30,31 Q32,32 31,37 Z"
+            fill="url(#lg${id})" stroke="${rim}" stroke-width=".8"/>
+      <path d="M17,30 Q15,25 16,21 Q17,18 22,18 Q27,18 28,21 Q29,25 27,30 Z"
+            fill="url(#cg${id})" stroke="${rim}" stroke-width=".5"/>
+      <ellipse cx="22" cy="21.5" rx="7" ry="1.8" fill="${rim}" opacity=".55"/>
+      <circle cx="22" cy="14" r="6" fill="url(#rg${id})" stroke="${rim}" stroke-width=".8"/>
+      <path d="M20.5,9.5 L22,5.5 L23.5,9.5 Q22.5,9 22,9 Q21.5,9 20.5,9.5 Z"
+            fill="url(#rg${id})" stroke="${rim}" stroke-width=".7"/>
+      <ellipse cx="19.5" cy="11.5" rx="2.2" ry="1.6" fill="${hi}" opacity=".5"/>
+    `; break;
+
+    case 'Q': body = `
+      <ellipse cx="22" cy="40.5" rx="12.5" ry="2.5" fill="url(#sh${id})"/>
+      <path d="M11.5,37 Q10.5,32 13,31 Q16.5,30 22,30 Q27.5,30 31,31 Q33.5,32 32.5,37 Z"
+            fill="url(#lg${id})" stroke="${rim}" stroke-width=".8"/>
+      <path d="M15.5,30 Q13.5,25 14.5,21 Q16,18 22,18 Q28,18 29.5,21 Q30.5,25 28.5,30 Z"
+            fill="url(#cg${id})" stroke="${rim}" stroke-width=".5"/>
+      <ellipse cx="22" cy="21.5" rx="8.5" ry="2" fill="${rim}" opacity=".5"/>
+      <circle cx="14.5" cy="15.5" r="3"   fill="url(#rg${id})" stroke="${rim}" stroke-width=".7"/>
+      <circle cx="22"   cy="12"   r="3.2" fill="url(#rg${id})" stroke="${rim}" stroke-width=".7"/>
+      <circle cx="29.5" cy="15.5" r="3"   fill="url(#rg${id})" stroke="${rim}" stroke-width=".7"/>
+      <circle cx="18"   cy="13.5" r="2.2" fill="url(#rg${id})" stroke="${rim}" stroke-width=".6"/>
+      <circle cx="26"   cy="13.5" r="2.2" fill="url(#rg${id})" stroke="${rim}" stroke-width=".6"/>
+      <ellipse cx="19" cy="23" rx="3" ry="3.5" fill="${hi}" opacity=".3"/>
+    `; break;
+
+    case 'K': body = `
+      <ellipse cx="22" cy="40.5" rx="12.5" ry="2.5" fill="url(#sh${id})"/>
+      <path d="M11.5,37 Q10.5,32 13,31 Q16.5,30 22,30 Q27.5,30 31,31 Q33.5,32 32.5,37 Z"
+            fill="url(#lg${id})" stroke="${rim}" stroke-width=".8"/>
+      <path d="M15.5,30 Q13.5,25 14.5,21 Q16,18 22,18 Q28,18 29.5,21 Q30.5,25 28.5,30 Z"
+            fill="url(#cg${id})" stroke="${rim}" stroke-width=".5"/>
+      <rect x="14.5" y="17.5" width="15" height="4.5" rx="1.5"
+            fill="url(#lg${id})" stroke="${rim}" stroke-width=".7"/>
+      <rect x="21"   y="7"    width="2.5" height="13" rx="1.2"
+            fill="url(#rg${id})" stroke="${rim}" stroke-width=".7"/>
+      <rect x="16.5" y="10.5" width="11" height="2.5" rx="1.2"
+            fill="url(#rg${id})" stroke="${rim}" stroke-width=".7"/>
+      <ellipse cx="19" cy="23" rx="3" ry="3.5" fill="${hi}" opacity=".3"/>
+    `; break;
+  }
+
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 44 44');
+  svg.setAttribute('width',  '62');
+  svg.setAttribute('height', '62');
+  svg.setAttribute('class',  'piece-svg');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.style.overflow = 'visible';
+  svg.innerHTML = defs + body;   // safe: all content is hardcoded constants, no user data
+  return svg;
+}
 
 // ── NOTIFICATIONS ──────────────────────────────
 let notifsOn = true;
@@ -568,12 +676,7 @@ function render() {
     if(!gameOver&&inCheck(turn,board)){const k=kingPos(turn,board);if(k&&k.r===r&&k.c===c)sq.classList.add('check-sq');}
     if(selSq&&legSet.has(`${r},${c}`)) sq.classList.add(board[r][c]?'leg-cap':'leg-empty');
 
-    if(p) {
-      const span=document.createElement('span');
-      span.className=`piece ${p.c===WC?'wp':'bp'}`;
-      span.textContent=SYM[p.c][p.t];
-      sq.appendChild(span);
-    }
+    if(p) sq.appendChild(createPieceEl(p));
     sq.addEventListener('click',()=>onClick(r,c));
     el.appendChild(sq);
   }
